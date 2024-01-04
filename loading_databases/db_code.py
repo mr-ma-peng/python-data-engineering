@@ -6,7 +6,7 @@ conn = sqlite3.connect('staff.db')
 table_name = 'INSTRUCTOR'
 attribute_list = ['ID', 'FNAME', 'LNAME', 'CITY', 'CODE']
 
-file_path = '//loadingDatabases/INSTRUCTOR.csv'
+file_path = '//loading_databases/INSTRUCTOR.csv'
 df = pd.read_csv(file_path)
 
 df.to_sql(table_name, conn, if_exists='replace', index=False)

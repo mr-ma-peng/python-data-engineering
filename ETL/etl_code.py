@@ -64,7 +64,7 @@ def log_progress(log_file_parameter, message):
 
 
 if __name__ == '__main__':
-    log_file = 'log_file.txt'
+    log_file = 'person_data/log_file.txt'
     target_file = 'transformed_data.csv'
 
     log_progress(log_file, "ETL: job started")
