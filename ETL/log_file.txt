@@ -1,0 +1,8 @@
+2024-01-03 13:51:37,ETL: job started
+2024-01-03 13:51:37,ETL: extracting data started
+2024-01-03 13:51:37,ETL: extracting data ended
+2024-01-03 13:51:37,ETL: transform data started
+2024-01-03 13:51:37,ETL: transform data ended
+2024-01-03 13:51:37,ETL: load data started
+2024-01-03 13:51:37,ETL: load data ended
+2024-01-03 13:51:37,ETL: job completed
