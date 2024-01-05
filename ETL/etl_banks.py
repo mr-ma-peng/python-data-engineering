@@ -19,7 +19,6 @@ avg_query_statement = 'SELECT AVG(MC_GBP_Billion) FROM Largest_banks'
 name_query_statement = 'SELECT Name from Largest_banks LIMIT 5'
 
 
-
 def log_progress(message):
     """ This function logs the mentioned message of a given stage of the
     code execution to a log file. Function returns nothing"""
@@ -28,11 +27,11 @@ def log_progress(message):
         f.write(timestamp + ': ' + message + '\n')
 
 
-def extract(url, table_attribs):
+def extract(data_source_url, table_attribs):
     """ This function aims to extract the required
     information from the website and save it to a data frame. The
     function returns the data frame for further processing. """
-    page = requests.get(url).text
+    page = requests.get(data_source_url).text
     data = BeautifulSoup(page, 'html.parser')
     df = pd.DataFrame(columns=table_attribs)
     tables = data.find_all('tbody')
@@ -53,41 +52,41 @@ def extract(url, table_attribs):
 
 def exchange_rate_direct_from_csv(rate_csv_path):
     """ This function reads the exchange rate dictionary from a local csv file"""
-    df = pd.read_csv(rate_csv_path)
-    exchange_rates = df.set_index('Currency').to_dict()['Rate']
+    data_frame = pd.read_csv(rate_csv_path)
+    exchange_rates = data_frame.set_index('Currency').to_dict()['Rate']
     return exchange_rates
 
 
-def transform(df, csv_path):
+def transform(data_frame, csv_path):
     """ This function accesses the CSV file for exchange rate
     information, and adds three columns to the data frame, each
     containing the transformed version of Market Cap column to
     respective currencies"""
     exchange_rate_dict = exchange_rate_direct_from_csv(csv_path)
-    df['MC_USD_Billion'] = [float(x.rstrip('\n')) for x in df['MC_USD_Billion']]
-    df['MC_GBP_Billion'] = [np.round(x*exchange_rate_dict['GBP'], 2) for x in df['MC_USD_Billion']]
-    df['MC_EUR_Billion'] = [np.round(x*exchange_rate_dict['EUR'], 2) for x in df['MC_USD_Billion']]
-    df['MC_INR_Billion'] = [np.round(x*exchange_rate_dict['INR'], 2) for x in df['MC_USD_Billion']]
-    return df
+    data_frame['MC_USD_Billion'] = [float(x.rstrip('\n')) for x in data_frame['MC_USD_Billion']]
+    data_frame['MC_GBP_Billion'] = [np.round(x * exchange_rate_dict['GBP'], 2) for x in data_frame['MC_USD_Billion']]
+    data_frame['MC_EUR_Billion'] = [np.round(x * exchange_rate_dict['EUR'], 2) for x in data_frame['MC_USD_Billion']]
+    data_frame['MC_INR_Billion'] = [np.round(x * exchange_rate_dict['INR'], 2) for x in data_frame['MC_USD_Billion']]
+    return data_frame
 
 
-def load_to_csv(df, output_path):
+def load_to_csv(data_frame, output_path):
     """ This function saves the final data frame as a CSV file in
     the provided path. Function returns nothing."""
-    df.to_csv(output_path)
+    data_frame.to_csv(output_path)
 
 
-def load_to_db(df, sql_connection, table_name):
+def load_to_db(data_frame, sql_connection, table_name):
     """ This function saves the final data frame to a database
     table with the provided name. Function returns nothing."""
-    df.to_sql(table_name, sql_connection, if_exists='replace', index=False)
+    data_frame.to_sql(table_name, sql_connection, if_exists='replace', index=False)
 
 
-def run_query(query_statement, sql_connection):
+def run_query(query_statement, connection):
     """ This function runs the query on the database table and
     prints the output on the terminal. Function returns nothing. """
     print(query_statement)
-    query_result = pd.read_sql(query_statement, sql_connection)
+    query_result = pd.read_sql(query_statement, connection)
     print(query_result)
 
 

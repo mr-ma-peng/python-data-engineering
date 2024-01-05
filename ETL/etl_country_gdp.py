@@ -15,11 +15,11 @@ table_name = 'Countries_by_GDP'
 csv_path = './countries_gdp_data/Countries_by_GDP.csv'
 
 
-def extract(url, table_attribs):
+def extract(data_source_url, table_attribs):
     """ This function extracts the required
     information from the website and saves it to a dataframe. The
     function returns the dataframe for further processing. """
-    page = requests.get(url).text
+    page = requests.get(data_source_url).text
     data = BeautifulSoup(page, 'html.parser')
     df = pd.DataFrame(columns=table_attribs)
     tables = data.find_all('tbody')
@@ -34,29 +34,29 @@ def extract(url, table_attribs):
     return df
 
 
-def transform(df):
+def transform(data_frame):
     """ This function converts the GDP information from Currency
     format to float value, transforms the information of GDP from
     USD (Millions) to USD (Billions) rounding to 2 decimal places.
     The function returns the transformed dataframe."""
-    gdp_list = df['GDP_USD_millions'].tolist()
+    gdp_list = data_frame['GDP_USD_millions'].tolist()
     gdp_list = [float("".join(x.split(","))) for x in gdp_list]
     gdp_list = [np.round(x/1000) for x in gdp_list]
-    df['GDP_USD_millions'] = gdp_list
-    df = df.rename(columns={"GDP_USD_millions": "GDP_USD_billions"})
-    return df
+    data_frame['GDP_USD_millions'] = gdp_list
+    data_frame = data_frame.rename(columns={"GDP_USD_millions": "GDP_USD_billions"})
+    return data_frame
 
 
-def load_to_csv(df, csv_path):
+def load_to_csv(data_frame, csv_path):
     """ This function saves the final dataframe as a `CSV` file
     in the provided path. Function returns nothing."""
-    df.to_csv(csv_path)
+    data_frame.to_csv(csv_path)
 
 
-def load_to_db(df, sql_connection, table_name):
+def load_to_db(data_frame, sql_connection, table_name):
     """ This function saves the final dataframe as a database table
     with the provided name. Function returns nothing."""
-    df.to_sql(table_name, sql_connection, if_exists='replace', index=False)
+    data_frame.to_sql(table_name, sql_connection, if_exists='replace', index=False)
 
 
 def run_query(query_statement, sql_connection):
