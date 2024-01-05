@@ -9,7 +9,8 @@ from datetime import datetime
 
 url = 'https://web.archive.org/web/20230908091635/https://en.wikipedia.org/wiki/List_of_largest_banks'
 table_attributes = ['Name', 'MC_USD_Billion']
-
+exchange_rate_csv_pate = './banks_latest_data/exchange_rate.csv'
+output_path = './banks_latest_data/output_result.csv'
 
 
 def log_progress(message):
@@ -43,12 +44,23 @@ def extract(url, table_attribs):
     return df
 
 
+def exchange_rate_direct_from_csv(rate_csv_path):
+    """ This function reads the exchange rate dictionary from a local csv file"""
+    df = pd.read_csv(rate_csv_path)
+    exchange_rates = df.set_index('Currency').to_dict()['Rate']
+    return exchange_rates
+
+
 def transform(df, csv_path):
     """ This function accesses the CSV file for exchange rate
     information, and adds three columns to the data frame, each
     containing the transformed version of Market Cap column to
     respective currencies"""
-
+    exchange_rate_dict = exchange_rate_direct_from_csv(csv_path)
+    df['MC_USD_Billion'] = [float(x.rstrip('\n')) for x in df['MC_USD_Billion']]
+    df['MC_GBP_Billion'] = [np.round(x*exchange_rate_dict['GBP'], 2) for x in df['MC_USD_Billion']]
+    df['MC_EUR_Billion'] = [np.round(x*exchange_rate_dict['EUR'], 2) for x in df['MC_USD_Billion']]
+    df['MC_INR_Billion'] = [np.round(x*exchange_rate_dict['INR'], 2) for x in df['MC_USD_Billion']]
     return df
 
 
@@ -74,11 +86,10 @@ portion is not inside any function.'''
 
 log_progress("Preliminaries complete. Initiating ETL process")
 df = extract(url, table_attributes)
-print(df)
 log_progress("Data extraction complete. Initiating Transformation process")
-# df = transform(df)
-# log_progress("Data transformation complete. Initiating Loading process")
-# load_to_csv(df, output_path)
+df = transform(df, exchange_rate_csv_pate)
+log_progress("Data transformation complete. Initiating Loading process")
+load_to_csv(df, output_path)
 # log_progress("Data saved to CSV file")
 # sql_connection = sqlite3.connect("")
 # log_progress("SQL Connection initiated")
