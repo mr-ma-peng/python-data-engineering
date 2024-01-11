@@ -27,3 +27,13 @@ pylint 代码分析
 > pandas, Series, Dataframe
 
 数据分析常用结构练习
+
+## package
+> module, package, library
+
+练习‘__init__.py' 打包📦，区分上述三个异同点
+
+## web_script
+> requests, beautifulSoup
+
+练习 html 数据元素提取
